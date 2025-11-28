@@ -4,25 +4,57 @@
     <meta charset="UTF-8">
     <title>Giỏ hàng của bạn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f1f3f5;
         }
         .cart-container {
-            background-color: white;
+            background-color: #fff;
             padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            font-weight: 700;
+            color: #198754;
+        }
+        table {
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        thead {
+            background-color: #198754;
+            color: #fff;
+        }
+        .btn-danger {
+            border-radius: 6px;
+        }
+        .btn-success, .btn-secondary, .btn-primary {
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card-title {
+            font-weight: 600;
+        }
+        #total-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #dc3545;
         }
     </style>
 </head>
 <body>
     <div class="container cart-container mt-5">
-        <h2 class="mb-4">🛒 Giỏ hàng của bạn</h2>
+        <h2 class="mb-4"><i class="fa-solid fa-cart-shopping"></i> Giỏ hàng của bạn</h2>
 
         {% if cart_items %}
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
                 <tr>
                     <th>Sản phẩm</th>
                     <th>Kích cỡ</th>
@@ -36,16 +68,18 @@
                 {% set total_price = 0 %}
                 {% for item, product in cart_items %}
                 <tr id="item-{{ item.id }}">
-                    <td>{{ product.name }}</td>
+                    <td><i class="fa-solid fa-box"></i> {{ product.name }}</td>
                     <td>{{ item.size }}</td>
                     <td>
-                        <input type="number" class="form-control quantity-input" style="width: 80px;" 
+                        <input type="number" class="form-control quantity-input text-center" style="width: 80px;" 
                                value="{{ item.quantity }}" min="1" data-item-id="{{ item.id }}" data-price="{{ product.price }}">
                     </td>
-                    <td class="product-price">{{ "{:,.0f}".format(product.price) }} VND</td>
-                    <td class="item-total">{{ "{:,.0f}".format(item.quantity * product.price) }} VND</td>
+                    <td class="product-price text-success fw-bold">{{ "{:,.0f}".format(product.price) }} VND</td>
+                    <td class="item-total fw-bold">{{ "{:,.0f}".format(item.quantity * product.price) }} VND</td>
                     <td>
-                        <button class="btn btn-sm btn-danger" onclick="removeFromCart('{{ item.id }}')">Xóa</button>
+                        <button class="btn btn-sm btn-danger" onclick="removeFromCart('{{ item.id }}')">
+                            <i class="fa-solid fa-trash"></i> Xóa
+                        </button>
                     </td>
                 </tr>
                 {% set total_price = total_price + (item.quantity * product.price) %}
@@ -57,18 +91,28 @@
             <div class="col-md-6"></div>
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Tổng cộng</h5>
-                        <h4 class="text-primary" id="total-price">{{ "{:,.0f}".format(total_price) }} VND</h4>
-                        <a href="{{ url_for('main.checkout') }}" class="btn btn-success w-100 mt-3" >Thanh toán</a>
-                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary w-100 mt-2">Tiếp tục mua sắm</a>
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fa-solid fa-coins"></i> Tổng cộng</h5>
+                        <h4 id="total-price">{{ "{:,.0f}".format(total_price) }} VND</h4>
+                        <a href="{{ url_for('main.checkout') }}" class="btn btn-success w-100 mt-3">
+                            <i class="fa-solid fa-credit-card"></i> Thanh toán
+                        </a>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary w-100 mt-2">
+                            <i class="fa-solid fa-store"></i> Tiếp tục mua sắm
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
         {% else %}
-        <div class="alert alert-info">Giỏ hàng của bạn đang trống.</div>
-        <a href="{{ url_for('main.index') }}" class="btn btn-primary">Quay lại mua sắm</a>
+        <div class="alert alert-info text-center">
+            <i class="fa-solid fa-circle-info"></i> Giỏ hàng của bạn đang trống.
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại mua sắm
+            </a>
+        </div>
         {% endif %}
     </div>
 
@@ -79,20 +123,13 @@
             
             fetch(`/api/remove-from-cart/${itemId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Xóa dòng khỏi bảng
                     document.getElementById(`item-${itemId}`).remove();
-                    
-                    // Tính lại tổng tiền
                     updateTotal();
-                    
-                    // Nếu giỏ hàng trống, làm mới trang
                     if (document.querySelectorAll('#cart-table-body tr').length === 0) {
                         setTimeout(() => location.reload(), 500);
                     }
@@ -111,25 +148,17 @@
             input.addEventListener('change', function() {
                 const itemId = this.getAttribute('data-item-id');
                 const quantity = parseInt(this.value);
-                
-                if (quantity < 1) {
-                    this.value = 1;
-                    return;
-                }
+                if (quantity < 1) { this.value = 1; return; }
                 
                 fetch(`/api/update-cart-item/${itemId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ quantity: quantity })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Cập nhật thành tiền cho dòng này
                         updateItemTotal(itemId);
-                        // Tính lại tổng tiền
                         updateTotal();
                     } else {
                         alert('Lỗi: ' + data.message);
@@ -150,7 +179,6 @@
             const price = parseFloat(priceText.replace(/[^\d]/g, ''));
             const quantity = parseInt(quantityInput.value);
             const total = quantity * price;
-            
             row.querySelector('.item-total').textContent = new Intl.NumberFormat('vi-VN').format(total) + ' VND';
         }
 
@@ -164,7 +192,6 @@
                 const quantity = parseInt(quantityInput.value);
                 total += quantity * price;
             });
-            
             document.getElementById('total-price').textContent = new Intl.NumberFormat('vi-VN').format(total) + ' VND';
         }
     </script>

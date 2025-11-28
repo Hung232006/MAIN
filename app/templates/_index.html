@@ -16,79 +16,103 @@
 
 <body>
   <main class="main">
-    <!-- Popup chào mừng -->
+
+    <!-- POPUP CHÀO MỪNG -->
     <div id="welcome-popup" class="popup" aria-hidden="true" role="dialog">
       <div class="popup-content">
-        <img src="{{ url_for('static', filename='icon/chao-mung.png') }}" alt="Chào mừng" class="popup-image" />
-        <button id="close-popup" class="close-btn" aria-label="Đóng">x</button>
+        <button id="close-popup" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+
+        <img src="{{ url_for('static', filename='icon/chao-mung.png') }}" alt="Chào mừng" class="popup-image">
+
         <div class="welcome-actions">
+          <h4>Chào mừng bạn đến với cửa hàng 👟</h4>
           <p>Bạn đã có tài khoản chưa?</p>
-          <a href="{{ url_for('auth.login') }}" id="btn-login" class="btn primary">Đăng nhập</a>
-          <a href="{{ url_for('auth.register') }}" id="btn-register" class="btn secondary">Đăng ký</a>
+
+          <a href="{{ url_for('auth.login') }}" class="btn primary">
+            <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+          </a>
+
+          <a href="{{ url_for('auth.register') }}" class="btn secondary">
+            <i class="fa-solid fa-user-plus"></i> Đăng ký
+          </a>
         </div>
       </div>
     </div>
 
+    <!-- HEADER -->
     <div class="main_body">
       <header class="header">
         <ul class="menu">
           <li><img src="{{ url_for('static', filename='icon/logo.png') }}" alt="Logo" /></li>
-          <li>Trang chủ</li>
-          <li>Liên hệ</li>
-          <li>Hotline: 1900</li>
+          <li><a href="#" class="nav-link">Trang chủ</a></li>
+          <li><a href="#" class="nav-link">Liện hệ</a></li>
+          <li><span class="hotline"><i class="fa-solid fa-phone"></i> Hotline: 1900</span></li>
           <li id="cart">
-            <a href="{{ url_for('main.view_cart') }}" style="text-decoration: none; color: inherit;">
+            <a href="{{ url_for('main.view_cart') }}" class="nav-link">
               Giỏ Hàng <i class="fa-solid fa-cart-shopping"></i>
-              <span id="cart-count" class="hidden">0</span>
+              <span id="cart-count" class="badge hidden">0</span>
             </a>
           </li>
         </ul>
       </header>
+
+
+           <!--POPUP SẢN PHẨM-->
       <div id="product-popup" class="popup" aria-hidden="true" role="dialog">
         <div class="popup-content product-content">
-          <button id="close-product-popup" class="close-btn" aria-label="Đóng">x</button>
+          <button id="close-product-popup" class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
 
           <div class="product-info">
             <div class="product-image-wrap">
-              <img id="popup-image" src="" alt="Ảnh sản phẩm" class="popup-image" />
+              <img id="popup-image" src="" alt="Ảnh sản phẩm">
             </div>
 
             <div class="product-meta">
               <h3 id="popup-name" class="product-name"></h3>
               <p id="popup-price" class="product-price"></p>
 
-              <div class="size-select">
-                <label for="popup-size"><strong>Kích cỡ:</strong></label>
-                <select id="popup-size">
-                  <option value="" selected>Chọn size</option>
-                  <option>38</option>
-                  <option>39</option>
-                  <option>40</option>
-                  <option>41</option>
-                  <option>42</option>
-                </select>
-              </div>
+              <label><strong>Kích cỡ:</strong></label>
+              <select id="popup-size">
+                <option value="">Chọn size</option>
+                <option>38</option>
+                <option>39</option>
+                <option>40</option>
+                <option>41</option>
+                <option>42</option>
+              </select>
 
               <div class="popup-actions">
-                <button id="btn-pay" class="btn primary">Thanh toán</button>
-                <button id="btn-add-cart" class="btn secondary">Thêm vào giỏ hàng</button>
+                <button id="btn-pay" class="btn primary">
+                  <i class="fa-solid fa-credit-card"></i> Thanh toán
+                </button>
+
+                <button id="btn-add-cart" class="btn secondary">
+                  <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
+                </button>
               </div>
             </div>
           </div>
-
         </div>
       </div>
-<img class="anhto" src="{{ url_for('static', filename='icon/backgroud.png') }}" alt="Ảnh nền" />
+
+      <!-- Banner -->
+      <img class="banner" src="{{ url_for('static', filename='icon/backgroud.png') }}" alt="Ảnh nền" />
+
+      <!-- Danh sách sản phẩm -->
       <section>
-        
+        <h2 class="section-title">Sản phẩm nổi bật</h2>
         <div class="products">
           {% for product in products %}
-          <div class="item">
-            <img src="{{ product.image }}" alt="{{ product.name }}">
-            <p>{{ product.name }}</p>
-            <p>{{ "{:,.0f}".format(product.price) }}đ</p>
-            <button class="btn">Mua Ngay</button>
-          </div>
+            <div class="item">
+              <img src="{{ product.image }}" alt="{{ product.name }}">
+              <h5>{{ product.name }}</h5>
+              <p class="price">{{ "{:,.0f}".format(product.price) }}đ</p>
+              <button class="btn buy-btn">
+                <i class="fa-solid fa-bolt"></i> Mua Ngay
+              </button>
+            </div>
           {% endfor %}
         </div>
       </section>

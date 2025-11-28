@@ -3,9 +3,12 @@ window.onload = function () {
   const welcomePopup = document.getElementById("welcome-popup");
   const btnCloseWelcome = document.getElementById("close-popup");
   if (welcomePopup && btnCloseWelcome) {
-    welcomePopup.style.display = "flex";
+    welcomePopup.classList.add("active");;
+welcomePopup.setAttribute("aria-hidden", "false");
     btnCloseWelcome.addEventListener("click", () => {
-      welcomePopup.style.display = "none";
+welcomePopup.classList.remove("active");
+welcomePopup.setAttribute("aria-hidden", "true");
+
     });
   }
 
@@ -28,8 +31,8 @@ window.onload = function () {
     btn.addEventListener("click", (e) => {
       const item = e.target.closest(".item");
       const imgEl = item.querySelector("img");
-      const nameEl = item.querySelectorAll("p")[0];
-      const priceEl = item.querySelectorAll("p")[1];
+      const nameEl = item.querySelector("h5");
+      const priceEl = item.querySelector(".price");
 
       popupImage.src = imgEl?.src || "";
       popupImage.alt = nameEl?.innerText || "Sản phẩm";
@@ -37,109 +40,132 @@ window.onload = function () {
       popupPrice.innerText = priceEl?.innerText || "";
       popupSize.value = ""; // reset chọn size
 
-      productPopup.style.display = "flex";
+      productPopup.classList.add("active");
       productPopup.setAttribute("aria-hidden", "false");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
 
   // Đóng popup sản phẩm
   if (closeProductPopup) {
     closeProductPopup.addEventListener("click", () => {
-      productPopup.style.display = "none";
+      productPopup.classList.remove("active");
       productPopup.setAttribute("aria-hidden", "true");
     });
   }
 
+  // Hàm hiển thị toast
+  function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+    toast.className = `toast-message ${type}`;
+    toast.innerText = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add("show"), 100);
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }
+
+  // Lấy số lượng giỏ hàng từ server khi load
+  fetch('/api/cart-count')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        cartCount = data.count;
+        if (cartCount > 0) {
+          cartCountEl.innerText = cartCount;
+          cartCountEl.classList.remove("hidden");
+        }
+      }
+    })
+    .catch(err => console.error("Không thể lấy số lượng giỏ hàng:", err));
+
   // Thêm vào giỏ hàng
   if (btnAddCart) {
     btnAddCart.addEventListener("click", () => {
-      // Bắt buộc chọn size trước khi thêm
       if (!popupSize.value) {
-        alert("Vui lòng chọn size trước khi thêm vào giỏ hàng.");
+        showToast("Vui lòng chọn size trước khi thêm vào giỏ hàng.", "error");
         return;
       }
 
       const productName = popupName.innerText;
       const size = popupSize.value;
 
-      // Gửi dữ liệu đến server
       fetch('/api/add-to-cart', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          product_name: productName,
-          size: size,
-          quantity: 1
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_name: productName, size: size, quantity: 1 })
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
           cartCount += 1;
           cartCountEl.innerText = String(cartCount);
           cartCountEl.classList.remove("hidden");
-          
-          alert("Đã thêm vào giỏ hàng!");
-          
-          // Ẩn popup sau khi thêm thành công
-          productPopup.style.display = "none";
+
+          showToast("Đã thêm vào giỏ hàng!");
+          productPopup.classList.remove("active");
           productPopup.setAttribute("aria-hidden", "true");
         } else {
-          alert("Lỗi: " + data.message);
+          showToast("Lỗi: " + data.message, "error");
         }
       })
-      .catch(error => {
-        console.error('Error:', error);
-        alert("Có lỗi xảy ra khi thêm vào giỏ hàng");
+      .catch(err => {
+        console.error("Error:", err);
+        showToast("Có lỗi xảy ra khi thêm vào giỏ hàng", "error");
       });
     });
   }
 
-  // Thanh toán (demo): chuyển hướng hoặc hiện thông báo
+  // Thanh toán demo
   if (btnPay) {
     btnPay.addEventListener("click", () => {
       if (!popupSize.value) {
-        alert("Bạn cần chọn size trước khi thanh toán.");
+        showToast("Bạn cần chọn size trước khi thanh toán.", "error");
         return;
       }
-      alert("Đi đến trang thanh toán (demo). Bạn có thể gắn link thật tại đây.");
-      // Ví dụ: window.location.href = "/checkout.html";
+      showToast("Đi đến trang thanh toán (demo).");
+      // window.location.href = "/checkout.html";
     });
   }
 
-  // Đóng popup khi click nền tối (bên ngoài nội dung)
+  // Đóng popup khi click nền tối
   [welcomePopup, productPopup].forEach((pop) => {
     if (!pop) return;
     pop.addEventListener("click", (e) => {
       if (e.target === pop) {
-        pop.style.display = "none";
+        pop.classList.remove("active");
         pop.setAttribute("aria-hidden", "true");
       }
     });
   });
 
+  // Đóng popup bằng phím ESC
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && productPopup.style.display === "flex") {
-      productPopup.style.display = "none";
-      productPopup.setAttribute("aria-hidden", "true");
+    if (e.key === "Escape") {
+      [welcomePopup, productPopup].forEach((pop) => {
+        if (pop && pop.classList.contains("active")) {
+          pop.classList.remove("active");
+          pop.setAttribute("aria-hidden", "true");
+        }
+      });
     }
   });
-  //sự kiện cho nút đăng nhập đăng kí
+
+  // Sự kiện cho nút đăng nhập/đăng ký
   const btnLogin = document.getElementById("btn-login");
-const btnRegister = document.getElementById("btn-register");
+  const btnRegister = document.getElementById("btn-register");
 
-if (btnLogin) {
-  btnLogin.addEventListener("click", () => {
-    window.location.href = "/login.html";
-  });
-}
-
-if (btnRegister) {
-  btnRegister.addEventListener("click", () => {
-    window.location.href = "/register.html";
-  });
-}
-
+  if (btnLogin) {
+    btnLogin.addEventListener("click", () => {
+      window.location.href = "/login.html";
+    });
+  }
+  if (btnRegister) {
+    btnRegister.addEventListener("click", () => {
+      window.location.href = "/register.html";
+    });
+  }
 };
