@@ -1,0 +1,284 @@
+/* Khung chính */
+.main {
+  max-width: 1600px;
+  min-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Popup chung */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  position: relative;
+  width: 570px;
+  max-width: 90%;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fadeIn 0.35s ease;
+  background: #000;
+}
+
+.popup-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  font-size: 20px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-btn:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Header + menu */
+.header {
+  margin-left: 10px;
+  background-color: black;
+  color: #fbf5f5;
+  transform: scale(1.06);
+  width: 100%;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 30px;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  margin: 10px;
+}
+
+.menu li i {
+  margin-left: 6px;
+  font-size: 18px;
+}
+
+.menu li i:hover {
+  cursor: pointer;
+  transform: scale(1.06);
+}
+
+.menu li img {
+  width: 100px;
+  height: auto;
+}
+
+.menu li {
+  margin: 0 10px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.menu li:hover {
+  transform: translateY(-3px) scale(1.06);
+  color: #debdb2;
+}
+
+.menu li:nth-last-child(4) {
+  margin-left: auto;
+}
+
+.menu li:nth-last-child(-n + 4) {
+  margin-right: 50px;
+}
+
+/* Ảnh nền */
+.anhto {
+  width: 100%;
+  margin: 10px;
+}
+
+/* Lưới sản phẩm */
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.products .item {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 13px;
+  display: flex;  
+  flex-direction: column;
+  align-items: center;
+}
+
+.products .item img {
+  width: 100%;
+  height: 80%;
+  display: block;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.products .item img:hover {
+  transform: scale(1.06);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.products p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+/* Nút chung */
+.btn {
+  border: none;
+  border-radius: 5px;
+  background-color: #e7c18f;
+  padding: 10px 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  background-color: #46b9b9;
+}
+
+/* Badge số lượng giỏ hàng */
+#cart-count {
+  background: #ff4d4f;
+  color: white;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  margin-left: 6px;
+  line-height: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Popup chi tiết sản phẩm */
+.product-content {
+  background: #111;
+  color: #fff;
+  padding: 16px;
+  width: 720px;
+  max-width: 95%;
+}
+
+.product-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.product-image-wrap {
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+}
+
+.product-image-wrap .popup-image {
+  height: 100%;
+  max-height: 380px;
+  object-fit: cover;
+}
+
+.product-name {
+  margin: 8px 0 4px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.product-price {
+  margin: 0 0 10px;
+  color: #e7c18f;
+  font-weight: 600;
+}
+
+.size-select select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #fff;
+  margin: 8px 0 16px;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Nút chính phụ */
+.btn.primary {
+  background: #2ecc71;
+  color: #000;
+  font-weight: 600;
+}
+
+.btn.primary:hover {
+  background: #27ae60;
+}
+
+.btn.secondary {
+  background: #f1c40f;
+  color: #000;
+  font-weight: 600;
+}
+
+.btn.secondary:hover {
+  background: #d4ac0d;
+}
+
+/* Popup chào mừng */
+.welcome-actions p {
+  color: white;
+}
+
+.welcome-actions {
+  text-align: center;
+}

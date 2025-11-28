@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+  <meta charset="UTF-8" />
+  <title>Cửa hàng giày</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- JavaScript -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+
+  <body>
+    <main class="main">
+      <!-- Popup chào mừng -->
+      <div id="welcome-popup" class="popup" aria-hidden="true">
+        <div class="popup-content">
+          <img src="icon/chao-mung.png" alt="Chào mừng" class="popup-image" />
+          <button id="close-popup" class="close-btn" aria-label="Đóng">x</button>
+          <!-- Phần hỏi đăng nhập/đăng ký -->
+          <div class="welcome-actions">
+            <p>Bạn đã có tài khoản chưa?</p>
+            <a href="login.html" id="btn-login" class="btnprimary">Đăng nhập</a>
+            <a href="login.html" id="btn-register" class="btnsecondary">Đăng ký</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="main_body">
+        <header class="header">
+          <ul class="menu">
+            <li><img src="icon/logo.png" alt="Logo" /></li>
+            <li>Trang chủ</li>
+            <li>Liên hệ</li>
+            <li>Hotline: 1900</li>
+            <li id="cart"><a href="{{ url_for('main.view_cart') }}">
+              Giỏ Hàng <i class="fa-solid fa-cart-shopping"></i>
+              <span id="cart-count" class="hidden">0</span>
+            </a></li>
+          </ul>
+        </header>
+
+        <!-- Popup chi tiết sản phẩm khi nhấn Mua Ngay -->
+        <div id="product-popup" class="popup" aria-hidden="true">
+          <div class="popup-content product-content">
+            <button id="close-product-popup" class="close-btn" aria-label="Đóng">x</button>
+
+            <div class="product-info">
+              <div class="product-image-wrap">
+                <img id="popup-image" src="" alt="Ảnh sản phẩm" class="popup-image" />
+              </div>
+
+              <div class="product-meta">
+                <h3 id="popup-name" class="product-name"></h3>
+                <p id="popup-price" class="product-price"></p>
+
+                <div class="size-select">
+                  <label for="popup-size"><strong>Kích cỡ:</strong></label>
+                  <select id="popup-size">
+                    <option value="" selected>Chọn size</option>
+                    <option>38</option>
+                    <option>39</option>
+                    <option>40</option>
+                    <option>41</option>
+                    <option>42</option>
+                  </select>
+                </div>
+
+                <div class="popup-actions">
+                  <button id="btn-pay" class="btn primary">Thanh toán</button>
+                  <button id="btn-add-cart" class="btn secondary">Thêm vào giỏ hàng</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <section>
+          <div class="main_box1">
+            <img class="anhto" src="icon/backgroud.png" alt="Ảnh nền" />
+            <div class="box1_product">
+              <div class="products">
+                <div class="item">
+                  <img src="https://tamanh.net/wp-content/uploads/2022/01/shop-giay-da-lon.jpg" alt="Giày Sneaker Da" />
+                  <p>Giày Sneaker Da</p>
+                  <p>450.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://lh3.googleusercontent.com/6euB1qM538WNYNFPEl1w1sNM00sTlgr0KBRqk_CeOlMFGOqq2yEBqe49HIldpfv8oVypbiwsdoQ6VMUsamiyGr_JibvyKUon85vMJtAxihuOC80xF_6le7hsx3ptiYce1N5pEGDCRNDL9I2X4kZ5AXY" alt="Giày Cao Cổ" />
+                  <p>Giày Cao Cổ</p>
+                  <p>550.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://file.hstatic.net/1000192210/file/cach-chup-giay-dep-3_4063194a64c74b86aa9433a3723f10dd.jpg" alt="Giày Sneaker Cổ Trung Xám" />
+                  <p>Giày Sneaker Cổ Trung Xám</p>
+                  <p>600.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://myshoes.vn/image/catalog/blog/26.11/mau-giay-the-thao-nam.jpeg" alt="Giày Chạy Adidas" />
+                  <p>Giày Chạy Adidas</p>
+                  <p>750.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://cf.shopee.vn/file/ab0f21cda8ea0eb8b444a8f03365d088" alt="Giày Sneaker" />
+                  <p>Giày Sneaker</p>
+                  <p>500.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://lh3.googleusercontent.com/6euB1qM538WNYNFPEl1w1sNM00sTlgr0KBRqk_CeOlMFGOqq2yEBqe49HIldpfv8oVypbiwsdoQ6VMUsamiyGr_JibvyKUon85vMJtAxihuOC80xF_6le7hsx3ptiYce1N5pEGDCRNDL9I2X4kZ5AXY" alt="Giày Dày" />
+                  <p>Giày Dày</p>
+                  <p>350.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://salt.tikicdn.com/cache/w1200/ts/product/32/2e/aa/716e8f83bcfef3e249922c0685fd1247.jpg" alt="Giày Cao Cổ Đỏ" />
+                  <p>Giày Cao Cổ Đỏ</p>
+                  <p>550.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://vn-test-11.slatic.net/p/23248c8fb9647b30f8013baff44c8029.jpg" alt="Giày Sneaker Đế Dày" />
+                  <p>Giày Sneaker Đế Dày</p>
+                  <p>500.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://media3.scdn.vn/img4/2023/04_08/XPkkUaOkcKS3tbLOwYGq.png" alt="Giày Trắng Xanh Nhẹ" />
+                  <p>Giày Trắng Xanh Nhẹ</p>
+                  <p>450.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+
+                <div class="item">
+                  <img src="https://cf.shopee.vn/file/8c4bdfcb1341fe0db77ad6e1677a0c3b" alt="Giày Chạy Thể Thao" />
+                  <p>Giày Chạy Thể Thao</p>
+                  <p>500.000đ</p>
+                  <button class="btn">Mua Ngay</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

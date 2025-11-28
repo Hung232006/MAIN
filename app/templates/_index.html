@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cửa hàng giày</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+
+<body>
+  <main class="main">
+    <!-- Popup chào mừng -->
+    <div id="welcome-popup" class="popup" aria-hidden="true" role="dialog">
+      <div class="popup-content">
+        <img src="{{ url_for('static', filename='icon/chao-mung.png') }}" alt="Chào mừng" class="popup-image" />
+        <button id="close-popup" class="close-btn" aria-label="Đóng">x</button>
+        <div class="welcome-actions">
+          <p>Bạn đã có tài khoản chưa?</p>
+          <a href="{{ url_for('auth.login') }}" id="btn-login" class="btn primary">Đăng nhập</a>
+          <a href="{{ url_for('auth.register') }}" id="btn-register" class="btn secondary">Đăng ký</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="main_body">
+      <header class="header">
+        <ul class="menu">
+          <li><img src="{{ url_for('static', filename='icon/logo.png') }}" alt="Logo" /></li>
+          <li>Trang chủ</li>
+          <li>Liên hệ</li>
+          <li>Hotline: 1900</li>
+          <li id="cart">
+            <a href="{{ url_for('main.view_cart') }}" style="text-decoration: none; color: inherit;">
+              Giỏ Hàng <i class="fa-solid fa-cart-shopping"></i>
+              <span id="cart-count" class="hidden">0</span>
+            </a>
+          </li>
+        </ul>
+      </header>
+
+      <!-- Popup chi tiết sản phẩm -->
+      <div id="product-popup" class="popup" aria-hidden="true" role="dialog">
+        <div class="popup-content product-content">
+          <button id="close-product-popup" class="close-btn" aria-label="Đóng">x</button>
+
+          <div class="product-info">
+            <div class="product-image-wrap">
+              <img id="popup-image" src="" alt="Ảnh sản phẩm" class="popup-image" />
+            </div>
+
+            <div class="product-meta">
+              <h3 id="popup-name" class="product-name"></h3>
+              <p id="popup-price" class="product-price"></p>
+
+              <div class="size-select">
+                <label for="popup-size"><strong>Kích cỡ:</strong></label>
+                <select id="popup-size">
+                  <option value="" selected>Chọn size</option>
+                  <option>38</option>
+                  <option>39</option>
+                  <option>40</option>
+                  <option>41</option>
+                  <option>42</option>
+                </select>
+              </div>
+
+              <div class="popup-actions">
+                <button id="btn-pay" class="btn primary">Thanh toán</button>
+                <button id="btn-add-cart" class="btn secondary">Thêm vào giỏ hàng</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+<img class="anhto" src="{{ url_for('static', filename='icon/backgroud.png') }}" alt="Ảnh nền" />
+      <section>
+        
+        <div class="products">
+          {% for product in products %}
+          <div class="item">
+            <img src="{{ product.image }}" alt="{{ product.name }}">
+            <p>{{ product.name }}</p>
+            <p>{{ "{:,.0f}".format(product.price) }}đ</p>
+            <button class="btn">Mua Ngay</button>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>

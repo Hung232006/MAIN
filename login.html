@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đăng nhập / Đăng ký</title>
+  <style>
+    .form-container { display: none; }
+    .form-container.active { display: block; }
+  </style>
+</head>
+<body>
+  <div id="login-form" class="form-container active">
+    <h2>Đăng nhập</h2>
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Mật khẩu" required />
+      <button type="submit">Đăng nhập</button>
+    </form>
+    <p>Chưa có tài khoản? <button id="show-register" type="button">Đăng ký</button></p>
+  </div>
+
+  <div id="register-form" class="form-container">
+    <h2>Đăng ký</h2>
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <input type="text" name="username" placeholder="Tên đăng nhập" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Mật khẩu" required />
+      <input type="password" name="requestpass" placeholder="Xác nhận mật khẩu" required />
+      <button type="submit">Đăng ký</button>
+    </form>
+    <p>Đã có tài khoản? <button id="show-login" type="button">Đăng nhập</button></p>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    document.getElementById("show-register").addEventListener("click", () => {
+      loginForm.classList.remove("active");
+      registerForm.classList.add("active");
+    });
+    document.getElementById("show-login").addEventListener("click", () => {
+      registerForm.classList.remove("active");
+      loginForm.classList.add("active");
+    });
+  </script>
+</body>
+</html>

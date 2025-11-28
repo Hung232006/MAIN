@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đăng nhập / Đăng ký</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .form-container { 
+      display: none;
+      text-align: center;
+    }
+    .form-container.active { 
+      display: block;
+      border: solid;
+      width: 50%;
+      text-align: center;
+      justify-content: center;
+    }
+    form {
+      display: grid;
+      padding: 20px;
+      margin: 20px;
+    }
+    .wrapper {
+      height: 50vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    input {
+      margin: 5px;
+      padding: 10px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+    }
+    .message {
+      color: red;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Hiển thị thông báo -->
+    {% if message %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <!-- Form đăng nhập -->
+    <div id="login-form" class="form-container active">
+      <h2>Đăng nhập</h2>
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Mật khẩu" required />
+        <button type="submit">Đăng nhập</button>
+      </form>
+      <p>Chưa có tài khoản? <button id="show-register" type="button">Đăng ký</button></p>
+    </div>
+
+    <!-- Form đăng ký -->
+    <div id="register-form" class="form-container">
+      <h2>Đăng ký</h2>
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        <input type="text" name="username" placeholder="Tên đăng nhập" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Mật khẩu" required />
+        <input type="password" name="requestpass" placeholder="Xác nhận mật khẩu" required />
+        <button type="submit">Đăng ký</button>
+      </form>
+      <p>Đã có tài khoản? <button id="show-login" type="button">Đăng nhập</button></p>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    document.getElementById("show-register").addEventListener("click", () => {
+      loginForm.classList.remove("active");
+      registerForm.classList.add("active");
+    });
+    document.getElementById("show-login").addEventListener("click", () => {
+      registerForm.classList.remove("active");
+      loginForm.classList.add("active");
+    });
+  </script>
+</body>
+</html>
