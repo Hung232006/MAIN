@@ -2,15 +2,63 @@ window.onload = function () {
   // Popup chào mừng
   const welcomePopup = document.getElementById("welcome-popup");
   const btnCloseWelcome = document.getElementById("close-popup");
-  if (welcomePopup && btnCloseWelcome) {
-    welcomePopup.classList.add("active");;
-welcomePopup.setAttribute("aria-hidden", "false");
-    btnCloseWelcome.addEventListener("click", () => {
-welcomePopup.classList.remove("active");
-welcomePopup.setAttribute("aria-hidden", "true");
 
-    });
+  // Hàm lưu trạng thái đăng nhập
+  function setLoginStatus(status) {
+    localStorage.setItem("isLoggedIn", status ? "true" : "false");
   }
+
+  // Kiểm tra trạng thái đăng nhập từ server
+  fetch("/api/check-login")
+    .then(res => res.json())
+    .then(data => {
+      const serverLoggedIn = data.logged_in === true;
+
+      if (serverLoggedIn) {
+        setLoginStatus(true);
+      }
+
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+      // Nếu chưa đăng nhập  hiện popup
+      if (!isLoggedIn && welcomePopup && btnCloseWelcome) {
+        welcomePopup.classList.add("active");
+        welcomePopup.setAttribute("aria-hidden", "false");
+
+        btnCloseWelcome.addEventListener("click", () => {
+          welcomePopup.classList.remove("active");
+          welcomePopup.setAttribute("aria-hidden", "true");
+        });
+      }
+    })
+    .catch(() => {
+      // Nếu server lỗi  fallback localStorage
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+      if (!isLoggedIn && welcomePopup && btnCloseWelcome) {
+        welcomePopup.classList.add("active");
+        welcomePopup.setAttribute("aria-hidden", "false");
+
+        btnCloseWelcome.addEventListener("click", () => {
+          welcomePopup.classList.remove("active");
+          welcomePopup.setAttribute("aria-hidden", "true");
+        });
+      }
+    });
+
+  // Hàm đăng nhập thành công
+  window.loginSuccess = function () {
+    setLoginStatus(true);
+    if (welcomePopup) {
+      welcomePopup.classList.remove("active");
+      welcomePopup.setAttribute("aria-hidden", "true");
+    }
+  };
+
+  // Hàm đăng xuất
+  window.logout = function () {
+    setLoginStatus(false);
+  };
 
   // Popup sản phẩm
   const productPopup = document.getElementById("product-popup");
@@ -26,7 +74,7 @@ welcomePopup.setAttribute("aria-hidden", "true");
   const cartCountEl = document.getElementById("cart-count");
   let cartCount = 0;
 
-  // Mở popup khi nhấn "Mua Ngay"
+  // Mở popup sản phẩm
   document.querySelectorAll(".products .item .btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const item = e.target.closest(".item");
@@ -38,7 +86,7 @@ welcomePopup.setAttribute("aria-hidden", "true");
       popupImage.alt = nameEl?.innerText || "Sản phẩm";
       popupName.innerText = nameEl?.innerText || "";
       popupPrice.innerText = priceEl?.innerText || "";
-      popupSize.value = ""; // reset chọn size
+      popupSize.value = "";
 
       productPopup.classList.add("active");
       productPopup.setAttribute("aria-hidden", "false");
@@ -54,7 +102,7 @@ welcomePopup.setAttribute("aria-hidden", "true");
     });
   }
 
-  // Hàm hiển thị toast
+  // Toast message
   function showToast(message, type = "success") {
     const toast = document.createElement("div");
     toast.className = `toast-message ${type}`;
@@ -68,7 +116,7 @@ welcomePopup.setAttribute("aria-hidden", "true");
     }, 3000);
   }
 
-  // Lấy số lượng giỏ hàng từ server khi load
+  // Lấy số lượng giỏ hàng
   fetch('/api/cart-count')
     .then(res => res.json())
     .then(data => {
@@ -79,10 +127,9 @@ welcomePopup.setAttribute("aria-hidden", "true");
           cartCountEl.classList.remove("hidden");
         }
       }
-    })
-    .catch(err => console.error("Không thể lấy số lượng giỏ hàng:", err));
+    });
 
-  // Thêm vào giỏ hàng
+  // Thêm vào giỏ
   if (btnAddCart) {
     btnAddCart.addEventListener("click", () => {
       if (!popupSize.value) {
@@ -98,24 +145,20 @@ welcomePopup.setAttribute("aria-hidden", "true");
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product_name: productName, size: size, quantity: 1 })
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          cartCount += 1;
-          cartCountEl.innerText = String(cartCount);
-          cartCountEl.classList.remove("hidden");
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            cartCount += 1;
+            cartCountEl.innerText = String(cartCount);
+            cartCountEl.classList.remove("hidden");
 
-          showToast("Đã thêm vào giỏ hàng!");
-          productPopup.classList.remove("active");
-          productPopup.setAttribute("aria-hidden", "true");
-        } else {
-          showToast("Lỗi: " + data.message, "error");
-        }
-      })
-      .catch(err => {
-        console.error("Error:", err);
-        showToast("Có lỗi xảy ra khi thêm vào giỏ hàng", "error");
-      });
+            showToast("Đã thêm vào giỏ hàng!");
+            productPopup.classList.remove("active");
+            productPopup.setAttribute("aria-hidden", "true");
+          } else {
+            showToast("Lỗi: " + data.message, "error");
+          }
+        });
     });
   }
 
@@ -127,7 +170,6 @@ welcomePopup.setAttribute("aria-hidden", "true");
         return;
       }
       showToast("Đi đến trang thanh toán (demo).");
-      // window.location.href = "/checkout.html";
     });
   }
 
@@ -142,7 +184,7 @@ welcomePopup.setAttribute("aria-hidden", "true");
     });
   });
 
-  // Đóng popup bằng phím ESC
+  // ESC để tắt popup
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       [welcomePopup, productPopup].forEach((pop) => {
@@ -154,7 +196,7 @@ welcomePopup.setAttribute("aria-hidden", "true");
     }
   });
 
-  // Sự kiện cho nút đăng nhập/đăng ký
+  // Login & Register Button
   const btnLogin = document.getElementById("btn-login");
   const btnRegister = document.getElementById("btn-register");
 

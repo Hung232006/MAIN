@@ -68,7 +68,9 @@ def update_cart_item(item_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
-
+@main_bp.route('/api/check-login')
+def check_login():
+    return jsonify({"logged_in": current_user.is_authenticated})
 @main_bp.route('/checkout')
 @login_required
 def checkout():

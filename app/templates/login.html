@@ -5,36 +5,92 @@
   <title>Đăng nhập / Đăng ký</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    .form-container { 
-      display: none;
-      text-align: center;
-    }
-    .form-container.active { 
-      display: block;
-      border: solid;
-      width: 50%;
-      text-align: center;
-      justify-content: center;
-    }
-    form {
-      display: grid;
-      padding: 20px;
-      margin: 20px;
-    }
-    .wrapper {
-      height: 50vh;
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
     }
+
+    .wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      width: 400px;
+      padding: 30px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-container {
+      display: none;
+    }
+
+    .form-container.active {
+      display: block;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
     input {
-      margin: 5px;
-      padding: 10px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
     }
+
+    input:focus {
+      border-color: #74ebd5;
+    }
+
     button {
-      margin-top: 10px;
-      padding: 10px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
     }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #ACB6E5, #74ebd5);
+    }
+
+    p {
+      margin-top: 15px;
+      color: #555;
+    }
+
+    .switch-btn {
+      background: none;
+      border: none;
+      color: #007BFF;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
     .message {
       color: red;
       font-weight: bold;
@@ -44,7 +100,6 @@
 </head>
 <body>
   <div class="wrapper">
-    <!-- Hiển thị thông báo -->
     {% if message %}
       <div class="message">{{ message }}</div>
     {% endif %}
@@ -57,7 +112,7 @@
         <input type="password" name="password" placeholder="Mật khẩu" required />
         <button type="submit">Đăng nhập</button>
       </form>
-      <p>Chưa có tài khoản? <button id="show-register" type="button">Đăng ký</button></p>
+      <p>Chưa có tài khoản? <button id="show-register" class="switch-btn" type="button">Đăng ký</button></p>
     </div>
 
     <!-- Form đăng ký -->
@@ -70,7 +125,7 @@
         <input type="password" name="requestpass" placeholder="Xác nhận mật khẩu" required />
         <button type="submit">Đăng ký</button>
       </form>
-      <p>Đã có tài khoản? <button id="show-login" type="button">Đăng nhập</button></p>
+      <p>Đã có tài khoản? <button id="show-login" class="switch-btn" type="button">Đăng nhập</button></p>
     </div>
   </div>
 

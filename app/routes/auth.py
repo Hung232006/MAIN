@@ -8,6 +8,10 @@ from .. import db   # dùng .. thay vì app để tránh vòng lặp import
 auth_bp = Blueprint('auth', __name__)
 
 # 🔹 Sau đó mới định nghĩa route
+@auth_bp.route('/profile')
+def profile():
+    return "Trang tài khoản của bạn"
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     message = None
