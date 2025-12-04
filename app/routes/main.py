@@ -1,15 +1,101 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from flask_login import login_required, current_user
-from app.models import db, CartItem, Product
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
+from flask_login import login_required, current_user, login_user, logout_user
+from app.models import db, CartItem, Product, User
 
 main_bp = Blueprint('main', __name__)
 
+# ============================
+# TRANG CHỦ
+# ============================
 @main_bp.route('/')
 @login_required
 def index():
     products = Product.query.all()
     return render_template('_index.html', products=products)
 
+
+# ============================
+# TRANG ADMIN (CHỈ ADMIN ĐƯỢC VÀO)
+# ============================
+@main_bp.route('/admin')
+@login_required
+def admin_page():
+    if not current_user.is_admin:
+        flash("Bạn không có quyền truy cập trang admin!")
+        return redirect(url_for('main.index'))
+    return render_template('admin.html')
+
+
+# ============================
+# TẠO TÀI KHOẢN ADMIN
+# ============================
+@main_bp.route('/create_admin', methods=['GET', 'POST'])
+def create_admin():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form["email"]
+        password = request.form['password']
+
+        # Check tồn tại
+        if User.query.filter_by(nameusers=username).first():
+            flash("Tên đăng nhập đã tồn tại!")
+            return redirect(url_for("main.create_admin"))
+
+        # Tạo admin
+        new_admin = User(
+            nameusers=username,
+            email=email,
+            is_admin=True
+        )
+        new_admin.set_password(password)
+        db.session.add(new_admin)
+        db.session.commit()
+
+        flash("Tạo tài khoản admin thành công!")
+        return redirect(url_for('main.login_page'))
+
+    return render_template("create_admin.html")
+
+
+# ============================
+# LOGIN
+# ============================
+@main_bp.route('/login', methods=['GET', 'POST'])
+def login_page():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        user = User.query.filter_by(nameusers=username).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+
+            # Chuyển hướng admin
+            if user.is_admin:
+                return redirect(url_for("main.admin_page"))
+
+            # user thường
+            return redirect(url_for("main.index"))
+
+        flash("Sai tài khoản hoặc mật khẩu!")
+
+    return render_template("login.html")
+
+
+# ============================
+# LOGOUT
+# ============================
+@main_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('main.login_page'))
+
+
+# ============================
+# GIỎ HÀNG (CODE CŨ CỦA BẠN)
+# ============================
 @main_bp.route('/cart')
 @login_required
 def view_cart():
@@ -22,88 +108,84 @@ def view_cart():
 
     return render_template('cart.html', cart_items=cart_items)
 
+
 @main_bp.route('/api/remove-from-cart/<int:item_id>', methods=['DELETE'])
 @login_required
 def remove_from_cart(item_id):
-    """Xóa sản phẩm khỏi giỏ hàng"""
     try:
         cart_item = CartItem.query.get(item_id)
-        
-        # Kiểm tra xem item có tồn tại và thuộc về user không
+
         if not cart_item or cart_item.user_id != current_user.id:
             return jsonify({'success': False, 'message': 'Không tìm thấy sản phẩm'}), 404
-        
+
         db.session.delete(cart_item)
         db.session.commit()
-        
+
         return jsonify({'success': True, 'message': 'Đã xóa khỏi giỏ hàng'}), 200
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
+
 
 @main_bp.route('/api/update-cart-item/<int:item_id>', methods=['PUT'])
 @login_required
 def update_cart_item(item_id):
-    """Cập nhật số lượng sản phẩm trong giỏ hàng"""
     try:
         data = request.get_json()
         quantity = data.get('quantity', 1)
-        
-        # Kiểm tra số lượng hợp lệ
+
         if quantity < 1:
             return jsonify({'success': False, 'message': 'Số lượng không hợp lệ'}), 400
-        
+
         cart_item = CartItem.query.get(item_id)
-        
-        # Kiểm tra xem item có tồn tại và thuộc về user không
+
         if not cart_item or cart_item.user_id != current_user.id:
             return jsonify({'success': False, 'message': 'Không tìm thấy sản phẩm'}), 404
-        
+
         cart_item.quantity = quantity
         db.session.commit()
-        
+
         return jsonify({'success': True, 'message': 'Cập nhật thành công'}), 200
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
 @main_bp.route('/api/check-login')
 def check_login():
     return jsonify({"logged_in": current_user.is_authenticated})
+
+
 @main_bp.route('/checkout')
 @login_required
 def checkout():
-    """Trang thanh toán"""
     return render_template('checkout.html')
+
 
 @main_bp.route('/api/add-to-cart', methods=['POST'])
 @login_required
 def add_to_cart():
-    """Thêm sản phẩm vào giỏ hàng"""
     try:
         data = request.get_json()
         product_name = data.get('product_name')
         size = data.get('size')
         quantity = data.get('quantity', 1)
-        
-        # Tìm sản phẩm theo tên
+
         product = Product.query.filter_by(name=product_name).first()
         if not product:
             return jsonify({'success': False, 'message': 'Sản phẩm không tồn tại'}), 404
-        
-        # Kiểm tra xem sản phẩm đã có trong giỏ không
+
         existing_item = CartItem.query.filter_by(
             user_id=current_user.id,
             product_id=product.id,
             size=size
         ).first()
-        
+
         if existing_item:
-            # Nếu có rồi thì tăng số lượng
             existing_item.quantity += quantity
         else:
-            # Nếu chưa có thì tạo mới
             cart_item = CartItem(
                 user_id=current_user.id,
                 product_id=product.id,
@@ -111,11 +193,11 @@ def add_to_cart():
                 size=size
             )
             db.session.add(cart_item)
-        
+
         db.session.commit()
+
         return jsonify({'success': True, 'message': 'Đã thêm vào giỏ hàng'}), 201
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
-        

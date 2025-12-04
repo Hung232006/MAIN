@@ -1,60 +1,54 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user
-from ..models import User
-from .. import db   # dùng .. thay vì app để tránh vòng lặp import
+from app.models import User, db
 
-# 🔹 Khai báo blueprint trước
-auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
 
-# 🔹 Sau đó mới định nghĩa route
-@auth_bp.route('/profile')
-def profile():
-    return "Trang tài khoản của bạn"
 
+# ===== LOGIN =====
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    message = None
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
 
         user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.pass_field, password):
+
+        if user and user.check_password(password):
             login_user(user)
+
+            if user.is_admin:
+                return redirect(url_for('admin.admin_dashboard'))
             return redirect(url_for('main.index'))
-        else:
-            message = "Sai email hoặc mật khẩu"
 
-    return render_template('login.html', message=message)
+        flash("Sai tài khoản hoặc mật khẩu!")
+
+    return render_template("login.html")   # <-- file chứa cả login + register
 
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
+# ===== REGISTER =====
+@auth_bp.route('/register', methods=['POST'])
 def register():
-    message = None
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        requestpass = request.form['requestpass']
+    username = request.form.get("username")
+    email = request.form.get("email")
+    password = request.form.get("password")
+    requestpass = request.form.get("requestpass")
 
-        if password != requestpass:
-            message = "Mật khẩu xác nhận không khớp"
-            return render_template('login.html', message=message)
+    if password != requestpass:
+        return render_template("login.html", message="Mật khẩu không trùng khớp!")
 
-        if User.query.filter_by(email=email).first():
-            message = "Email đã tồn tại"
-            return render_template('login.html', message=message)
+    # kiểm tra trùng email
+    if User.query.filter_by(email=email).first():
+        return render_template("login.html", message="Email đã tồn tại!")
 
-        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
-        new_user = User(nameusers=username, email=email, pass_field=hashed_pw)
-        db.session.add(new_user)
-        db.session.commit()
+    # tạo user mới
+    new_user = User(nameusers=username, email=email, is_admin=False)
+    new_user.set_password(password)
 
-        message = "Đăng ký thành công, hãy đăng nhập"
-        return render_template('login.html', message=message)
+    db.session.add(new_user)
+    db.session.commit()
 
-    return render_template('login.html', message=message)
+    return render_template("login.html", message="Đăng ký thành công! Hãy đăng nhập.")
 
 
 @auth_bp.route('/logout')

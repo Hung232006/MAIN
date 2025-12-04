@@ -42,40 +42,48 @@
     <!-- HEADER -->
     <div class="main_body">
       <header class="header">
-<ul class="menu">
-    <li><img src="{{ url_for('static', filename='icon/logo.png') }}" alt="Logo" /></li>
+        <ul class="menu">
+          <li><img src="{{ url_for('static', filename='icon/logo.png') }}" alt="Logo" /></li>
 
-    <li><a href="#" class="nav-link">Trang chủ</a></li>
-    <li><a href="#" class="nav-link">Liên hệ</a></li>
+          <li><a href="#" class="nav-link">Trang chủ</a></li>
+          <li><a href="#" class="nav-link">Liện hệ</a></li>
 
-    <li>
-      <span class="hotline">
-        <i class="fa-solid fa-phone"></i> Hotline: 1900
-      </span>
-    </li>
+          <li>
+            <span class="hotline">
+              <i class="fa-solid fa-phone"></i> Hotline: 1900
+            </span>
+          </li>
 
-    <!-- GIỎ HÀNG -->
-    <li id="cart">
-      <a href="{{ url_for('main.view_cart') }}" class="nav-link">
-        Giỏ Hàng <i class="fa-solid fa-cart-shopping"></i>
-        <span id="cart-count" class="badge hidden">0</span>
-      </a>
-    </li>
+          <!-- GIỎ HÀNG -->
+          <li id="cart">
+            <a href="{{ url_for('main.view_cart') }}" class="nav-link">
+              Giỏ Hàng <i class="fa-solid fa-cart-shopping"></i>
+              <span id="cart-count" class="badge hidden">0</span>
+            </a>
+          </li>
 
-    <!-- NÚT TÀI KHOẢN -->
-    <li>
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('auth.profile') }}" class="nav-link">
-          <i class="fa-solid fa-user"></i> Tài khoản
-        </a>
-      {% else %}
-        <a href="{{ url_for('auth.login') }}" class="nav-link">
-          <i class="fa-solid fa-user"></i> Tài khoản
-        </a>
-      {% endif %}
-    </li>
-</ul>
+          <!-- TÀI KHOẢN -->
+          <li class="account-menu">
+            {% if current_user.is_authenticated %}
+              <div class="user-box">
+                <i class="fa-solid fa-user"></i>
+                <span>{{ current_user.username }}</span>
 
+                <a href="{{ url_for('auth.logout') }}" class="nav-link logout-btn">
+                  <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </a>
+              </div>
+            {% else %}
+              <a href="{{ url_for('auth.login') }}" class="nav-link">
+                <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+              </a>
+
+              <a href="{{ url_for('auth.register') }}" class="nav-link">
+                <i class="fa-solid fa-user-plus"></i> Đăng ký
+              </a>
+            {% endif %}
+          </li>
+        </ul>
       </header>
 
       <!-- POPUP SẢN PHẨM -->

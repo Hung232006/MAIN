@@ -2,10 +2,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from .config import Config
-from .routes.payment import payment_bp
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+
 
 def create_app():
     app = Flask(__name__)
@@ -13,7 +14,6 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
 
     from .models import User
 
@@ -21,12 +21,16 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # Import Blueprint
     from .routes.auth import auth_bp
     from .routes.main import main_bp
     from .routes.payment import payment_bp
+    from .routes.admin import admin_bp
 
+    # Đăng ký Blueprint
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
-    app.register_blueprint(payment_bp)  
+    app.register_blueprint(payment_bp)
+    app.register_blueprint(admin_bp)
 
     return app
