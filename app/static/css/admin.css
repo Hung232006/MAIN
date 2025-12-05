@@ -114,6 +114,7 @@ body{
 .order-row{
     display:flex;
     justify-content:space-between;
+    text-align: center;
 }
 
 .badge{

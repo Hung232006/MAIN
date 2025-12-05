@@ -25,12 +25,22 @@
 
     <!-- DASHBOARD -->
     <section id="dashboard" class="main-section">
-      <!-- TOP STATS -->
-      <section class="stats">
-        <div class="card"><div class="stat-title">Total Sales</div><div class="stat-value">$12,345</div></div>
-        <div class="card"><div class="stat-title">Orders</div><div class="stat-value">678</div></div>
-        <div class="card"><div class="stat-title">Customers</div><div class="stat-value">456</div></div>
-      </section>
+<!-- TOP STATS -->
+<section class="stats">
+  <div class="card">
+    <div class="stat-title">Total Sales</div>
+    <div class="stat-value">${{ total_sales }}</div>
+  </div>
+  <div class="card">
+    <div class="stat-title">Orders</div>
+    <div class="stat-value">{{ total_quantity }}</div>
+  </div>
+  <div class="card">
+    <div class="stat-title">Customers</div>
+    <div class="stat-value">{{ total_customers }}</div>
+  </div>
+</section>
+
 
       <!-- SALES CHART + ORDERS -->
       <section class="grid-2">
@@ -40,21 +50,32 @@
         </div>
         <div class="card">
           <h3>Recent Orders</h3>
-          <div class="recent-list">
-            <div class="order"><div class="order-row"><div>#1234 - John Doe</div><span class="badge delivered">Delivered</span></div></div>
-            <div class="order"><div class="order-row"><div>#1233 - Jane Smith</div><span class="badge processing">Processing</span></div></div>
-            <div class="order"><div class="order-row"><div>#1232 - Emily Johnson</div><span class="badge pending">Pending</span></div></div>
-          </div>
+<!-- Recent Orders -->
+<div class="recent-list">
+  {% for order in recent_cart_items %}
+  <div class="order">
+    <div class="order-row">
+      <div>#{{ cart_items.id }} - {{ cart_items.user.username }}</div>
+      <span class="badge {{ cart_items.status }}">{{ cart_items.status|capitalize }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
         </div>
       </section>
 
       <!-- PRODUCTS -->
       <section class="bottom-grid">
         <div class="products">
-          <div class="product"><div class="shoe"></div><div class="pname">White Sneaker</div><div class="price">$75</div></div>
-          <div class="product"><div class="shoe"></div><div class="pname">Brown Boot</div><div class="price">$120</div></div>
-          <div class="product"><div class="shoe"></div><div class="pname">Black Running</div><div class="price">$90</div></div>
-        </div>
+  {% for product in recent_products %}
+  <div class="product">
+    <div class="shoe"></div>
+    <div class="pname">{{ product.name }}</div>
+    <div class="price">${{ product.price }}</div>
+  </div>
+  {% endfor %}
+</div>
         <div class="right-column">
           <h3>Recent Orders</h3>
           <div class="order"><div class="order-row"><div>#1234 - John Doe</div><span class="badge delivered">Delivered</span></div></div>
@@ -84,7 +105,20 @@
     <!-- ORDERS PAGE -->
     <section id="orders" class="main-section" style="display:none">
       <h2>Orders</h2>
-      <p>Danh sách đơn hàng sẽ hiển thị ở đây...</p>
+      <div class="recent-list">
+  {% for cart in carts %}
+  <div class="order">
+    <div class="order-row">
+      <div>Tên sản phẩm: {{ cart.product.name }}</div>
+      <span class="badge {{ cart.status }}">{{ cart.status|capitalize }}</span>
+      <div>Số lượng: {{ cart.quantity }}</div>
+      <div>Ngày tạo: {{ cart.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+      
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
     </section>
 
   </main>

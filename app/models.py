@@ -2,7 +2,9 @@ from . import db
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import pytz
 
+vn_tz = pytz.timezone("Asia/Ho_Chi_Minh")
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -34,7 +36,10 @@ class Product(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     image = db.Column(db.String(255))
     description = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(vn_tz)  # giờ VN
+    )
 
 
 class CartItem(db.Model):
@@ -46,6 +51,10 @@ class CartItem(db.Model):
 
     quantity = db.Column(db.Integer, default=1)
     size = db.Column(db.String(10))
-
+    status = db.Column(db.String(20), nullable=False, default='pending')
     product = db.relationship('Product')
-    user = db.relationship('User')
+    user = db.relationship('User') 
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(vn_tz)  # giờ VN
+    )

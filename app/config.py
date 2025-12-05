@@ -8,4 +8,4 @@ class Config:
     VNP_TMN_CODE = "YOUR_TMN_CODE"
     VNP_HASH_SECRET = "YOUR_SECRET_KEY"
     VNP_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    VNP_RETURN_URL = "http://localhost:5000/payment_return"
+    VNP_RETURN_URL = "http://localhost:5000/payment_return"  # Local testing
