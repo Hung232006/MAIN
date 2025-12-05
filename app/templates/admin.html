@@ -25,57 +25,58 @@
 
     <!-- DASHBOARD -->
     <section id="dashboard" class="main-section">
-<!-- TOP STATS -->
-<section class="stats">
-  <div class="card">
-    <div class="stat-title">Total Sales</div>
-    <div class="stat-value">${{ total_sales }}</div>
-  </div>
-  <div class="card">
-    <div class="stat-title">Orders</div>
-    <div class="stat-value">{{ total_quantity }}</div>
-  </div>
-  <div class="card">
-    <div class="stat-title">Customers</div>
-    <div class="stat-value">{{ total_customers }}</div>
-  </div>
-</section>
-
+      <!-- TOP STATS -->
+      <section class="stats">
+        <div class="card">
+          <div class="stat-title">Total Sales</div>
+          <div class="stat-value">${{ total_sales }}</div>
+        </div>
+        <div class="card">
+          <div class="stat-title">Orders</div>
+          <div class="stat-value">{{ total_quantity }}</div>
+        </div>
+        <div class="card">
+          <div class="stat-title">Customers</div>
+          <div class="stat-value">{{ total_customers }}</div>
+        </div>
+      </section>
 
       <!-- SALES CHART + ORDERS -->
       <section class="grid-2">
         <div class="card chart-card">
           <div class="chart-title">Sales</div>
-          <div class="chart-svg"><img src="chart.png" width="100%"></div>
+          <div class="chart-svg"><div class="card chart-card">
+  <div class="chart-title">Sales</div>
+  <canvas id="salesChart"></canvas>
+</div>
+</div>
         </div>
         <div class="card">
           <h3>Recent Orders</h3>
-<!-- Recent Orders -->
-<div class="recent-list">
-  {% for order in recent_cart_items %}
-  <div class="order">
-    <div class="order-row">
-      <div>#{{ cart_items.id }} - {{ cart_items.user.username }}</div>
-      <span class="badge {{ cart_items.status }}">{{ cart_items.status|capitalize }}</span>
-    </div>
-  </div>
-  {% endfor %}
-</div>
-
+          <div class="recent-list">
+            {% for order in recent_cart_items %}
+            <div class="order">
+              <div class="order-row">
+                <div>#{{ cart_items.id }} - {{ cart_items.user.username }}</div>
+                <span class="badge {{ cart_items.status }}">{{ cart_items.status|capitalize }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
       </section>
 
       <!-- PRODUCTS -->
       <section class="bottom-grid">
         <div class="products">
-  {% for product in recent_products %}
-  <div class="product">
-    <div class="shoe"></div>
-    <div class="pname">{{ product.name }}</div>
-    <div class="price">${{ product.price }}</div>
-  </div>
-  {% endfor %}
-</div>
+          {% for product in recent_products %}
+          <div class="product">
+            <div class="shoe"></div>
+            <div class="pname">{{ product.name }}</div>
+            <div class="price">${{ product.price }}</div>
+          </div>
+          {% endfor %}
+        </div>
         <div class="right-column">
           <h3>Recent Orders</h3>
           <div class="order"><div class="order-row"><div>#1234 - John Doe</div><span class="badge delivered">Delivered</span></div></div>
@@ -91,12 +92,40 @@
           <h2>Products</h2>
           <button class="add-btn">Add Product</button>
         </div>
+
+        <!-- Form thêm sản phẩm -->
+        <div id="addProductForm" style="display:none" class="form-container">
+          <h3>Thêm sản phẩm mới</h3>
+          <form method="POST" action="/add_product">
+            <label>Tên sản phẩm:</label>
+            <input type="text" name="name" required>
+
+            <label>Giá:</label>
+            <input type="number" name="price" required>
+
+            <label>Số lượng tồn kho:</label>
+            <input type="number" name="inventory" required>
+
+            <label>Ảnh (URL):</label>
+            <input type="text" name="image_url">
+
+            <button type="submit">Lưu</button>
+            <button type="button" onclick="closeForm()">Hủy</button>
+          </form>
+        </div>
+
+        <!-- Bảng sản phẩm -->
         <table>
           <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Inventory</th></tr></thead>
           <tbody>
-            <tr><td><img src="https://i.imgur.com/1OeXKDn.png" class="product-img"></td><td>White Sneaker</td><td>$75</td><td>200 in stock</td></tr>
-            <tr><td><img src="https://i.imgur.com/AX2QHTI.png" class="product-img"></td><td>Brown Boot</td><td>$120</td><td>90 in stock</td></tr>
-            <tr><td><img src="https://i.imgur.com/Gss5zEu.png" class="product-img"></td><td>Black Running</td><td>$80</td><td>200 in stock</td></tr>
+            {% for product in products %}
+            <tr>
+              <td><img src="{{ product.image_url }}" class="product-img"></td>
+              <td>{{ product.name }}</td>
+              <td>${{ product.price }}</td>
+              <td>{{ product.inventory }} in stock</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -106,19 +135,17 @@
     <section id="orders" class="main-section" style="display:none">
       <h2>Orders</h2>
       <div class="recent-list">
-  {% for cart in carts %}
-  <div class="order">
-    <div class="order-row">
-      <div>Tên sản phẩm: {{ cart.product.name }}</div>
-      <span class="badge {{ cart.status }}">{{ cart.status|capitalize }}</span>
-      <div>Số lượng: {{ cart.quantity }}</div>
-      <div>Ngày tạo: {{ cart.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
-      
-    </div>
-  </div>
-  {% endfor %}
-</div>
-
+        {% for cart in carts %}
+        <div class="order">
+          <div class="order-row">
+            <div>Tên sản phẩm: {{ cart.product.name }}</div>
+            <span class="badge {{ cart.status }}">{{ cart.status|capitalize }}</span>
+            <div>Số lượng: {{ cart.quantity }}</div>
+            <div>Ngày tạo: {{ cart.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </section>
 
   </main>
@@ -126,7 +153,7 @@
 
 <script>
 function showSection(id) {
-  // Ẩn chỉ các section cấp cao
+  // Ẩn tất cả section
   document.querySelectorAll('main .main-section').forEach(sec => sec.style.display = 'none');
   // Hiện section được chọn
   document.getElementById(id).style.display = 'block';
@@ -135,6 +162,19 @@ function showSection(id) {
   document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
   document.querySelector(`.nav a[onclick="showSection('${id}')"]`).classList.add('active');
 }
+
+// Hiện form thêm sản phẩm
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.add-btn').addEventListener('click', () => {
+    document.getElementById('addProductForm').style.display = 'block';
+  });
+});
+
+function closeForm() {
+  document.getElementById('addProductForm').style.display = 'none';
+}
+ 
+
 </script>
 </body>
 </html>

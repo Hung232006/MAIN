@@ -4,6 +4,8 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import pytz
 
+
+
 vn_tz = pytz.timezone("Asia/Ho_Chi_Minh")
 
 class User(db.Model, UserMixin):
@@ -31,6 +33,7 @@ class User(db.Model, UserMixin):
 
 class Product(db.Model):
     __tablename__ = 'products'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)

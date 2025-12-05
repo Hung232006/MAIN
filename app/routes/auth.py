@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user
-from app.models import User, db
+from app.models import Product, User, db
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
 
@@ -55,3 +55,22 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+@auth_bp.route('/add_product', methods=['POST'])
+def add_product():
+    name = request.form['name']
+    price = request.form['price']
+    inventory = request.form['inventory']
+    image_url = request.form['image_url']
+
+    new_product = Product(
+        name=name,
+        price=price,
+        inventory=inventory,
+        image_url=image_url
+    )
+    db.session.add(new_product)
+    db.session.commit()
+
+    # Nếu admin dashboard nằm trong blueprint "admin"
+    return redirect(url_for('admin.admin_dashboard'))
+
