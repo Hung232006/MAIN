@@ -1,6 +1,8 @@
+from datetime import datetime
 from flask import Blueprint, current_app, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, current_user, login_user, logout_user
 from app.models import db, User, Product, CartItem
+from app.routes.payment import get_cart_total
 
 main_bp = Blueprint("main", __name__)
 
@@ -169,4 +171,12 @@ def check_login():
 @main_bp.route("/checkout")
 @login_required
 def checkout():
-    return render_template("checkout.html")
+    total_amount, cart_items = get_cart_total()
+    order_id = "DH" + datetime.now().strftime("%Y%m%d%H%M%S")
+    return render_template(
+        "checkout.html",
+        order_id=order_id,
+        amount=total_amount,
+        cart_items=cart_items,
+        title="Thanh toán"
+    )

@@ -1,4 +1,4 @@
-import urllib.parse, hashlib
+import urllib.parse, hmac, hashlib
 
 class vnpay:
     def __init__(self):
@@ -8,16 +8,24 @@ class vnpay:
         if not base_url or not secret_key:
             raise ValueError("base_url hoặc secret_key không được để trống")
 
-        # Sắp xếp params theo key
-        sorted_params = sorted(self.requestData.items())
+        # Lọc bỏ tham số rỗng và vnp_SecureHash nếu có
+        params = {k: v for k, v in self.requestData.items() if v not in [None, ""] and k != "vnp_SecureHash"}
 
-        # Tạo query string
-        query_string = urllib.parse.urlencode(sorted_params)
+        # Sắp xếp theo key alphabet
+        sorted_params = sorted(params.items())
 
-        # Chuỗi để hash
-        hash_data = "&".join([f"{k}={v}" for k, v in sorted_params])
+        # Tạo query string (URL-encode giá trị)
+        query_list = []
+        for k, v in sorted_params:
+            query_list.append(f"{k}={urllib.parse.quote_plus(str(v).strip())}")
+        query_string = "&".join(query_list)
 
-        # Tạo secure hash
-        secure_hash = hashlib.sha512((secret_key + hash_data).encode("utf-8")).hexdigest()
+        # Tạo secure hash bằng HMAC-SHA512
+        secure_hash = hmac.new(
+            secret_key.encode("utf-8"),
+            query_string.encode("utf-8"),
+            hashlib.sha512
+        ).hexdigest()
 
+        # Gắn chữ ký vào cuối query
         return f"{base_url}?{query_string}&vnp_SecureHash={secure_hash}"
