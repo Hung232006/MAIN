@@ -8,4 +8,4 @@ class Config:
     VNP_TMN_CODE = "NJFA55LY"   # Mã định danh merchant
     VNP_HASH_SECRET = "BN6AYXN4DSTT4ENVLFGUDHD96XV34UIM"  # Chuỗi bí mật tạo checksum
     VNP_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"  # URL sandbox
-    VNP_RETURN_URL = "https://duchungstore.onrender.com"  # URL nhận kết quả trả về
+    VNP_RETURN_URL = "https://duchungstore.onrender.com/payment_return"  # URL nhận kết quả trả về
