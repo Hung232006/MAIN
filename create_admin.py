@@ -4,11 +4,11 @@ from app.models import User
 app = create_app()
 with app.app_context():
     admin = User(
-        nameusers="admin",
+        username="admin",              # phải dùng 'username'
         email="admin@gmail.com",
         is_admin=True
     )
-    admin.set_password("123456")
+    admin.set_password("123456")       # hash mật khẩu
     db.session.add(admin)
     db.session.commit()
     print("Admin đã được tạo!")

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required, current_user
 from app.models import Product, User, db
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
@@ -23,7 +23,7 @@ def login():
 
         flash("Sai tài khoản hoặc mật khẩu!")
 
-    return render_template("login.html")   # <-- file chứa cả login + register
+    return render_template("login.html")   # file chứa cả login + register
 
 
 # ===== REGISTER =====
@@ -42,35 +42,41 @@ def register():
         return render_template("login.html", message="Email đã tồn tại!")
 
     # tạo user mới
-    new_user = User(nameusers=username, email=email, is_admin=False)
+    new_user = User(username=username, email=email, is_admin=False)  # đổi nameusers -> username
     new_user.set_password(password)
-
     db.session.add(new_user)
     db.session.commit()
 
     return render_template("login.html", message="Đăng ký thành công! Hãy đăng nhập.")
 
 
+# ===== LOGOUT =====
 @auth_bp.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+
+
+# ===== ADD PRODUCT (chỉ admin) =====
 @auth_bp.route('/add_product', methods=['POST'])
+@login_required
 def add_product():
+    if not current_user.is_admin:
+        flash("Bạn không có quyền thêm sản phẩm!")
+        return redirect(url_for('main.index'))
+
     name = request.form['name']
     price = request.form['price']
-    inventory = request.form['inventory']
     image_url = request.form['image_url']
+    description = request.form.get('description', "")
 
     new_product = Product(
         name=name,
         price=price,
-        inventory=inventory,
-        image_url=image_url
+        image=image_url,       # đổi image_url -> image
+        description=description
     )
     db.session.add(new_product)
     db.session.commit()
 
-    # Nếu admin dashboard nằm trong blueprint "admin"
     return redirect(url_for('admin.admin_dashboard'))
-

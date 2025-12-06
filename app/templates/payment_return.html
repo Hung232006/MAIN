@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .footer a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        {% if result == "Thành công" %}
+            <p class="success">✅ Thanh toán thành công!</p>
+        {% elif result == "Lỗi" %}
+            <p class="error">❌ Thanh toán thất bại!</p>
+        {% else %}
+            <p>Không có dữ liệu thanh toán.</p>
+        {% endif %}
+
+        {% if order_id %}
+        <table>
+            <tr>
+                <td>Mã đơn hàng:</td>
+                <td>{{ order_id }}</td>
+            </tr>
+            <tr>
+                <td>Số tiền:</td>
+                <td>{{ amount }} VND</td>
+            </tr>
+            <tr>
+                <td>Nội dung:</td>
+                <td>{{ order_desc }}</td>
+            </tr>
+            <tr>
+                <td>Mã giao dịch VNPAY:</td>
+                <td>{{ vnp_TransactionNo }}</td>
+            </tr>
+            <tr>
+                <td>Mã phản hồi:</td>
+                <td>{{ vnp_ResponseCode }}</td>
+            </tr>
+            {% if msg %}
+            <tr>
+                <td>Thông báo:</td>
+                <td>{{ msg }}</td>
+            </tr>
+            {% endif %}
+        </table>
+        {% endif %}
+
+        <div class="footer">
+            <a href="/">⬅ Quay lại trang chủ</a>
+        </div>
+    </div>
+</body>
+</html>

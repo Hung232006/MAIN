@@ -1,17 +1,19 @@
+from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from .config import Config
 
+# Khởi tạo đối tượng toàn cục
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
-
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Khởi tạo extension với app
     db.init_app(app)
     login_manager.init_app(app)
 
@@ -33,4 +35,5 @@ def create_app():
     app.register_blueprint(payment_bp)
     app.register_blueprint(admin_bp)
 
+    app.jinja_env.globals['now'] = datetime.now
     return app

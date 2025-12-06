@@ -23,20 +23,6 @@
             border-radius: 8px;
             padding: 10px 20px;
         }
-        #qr-code {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
-        #qr-img {
-            width: 220px;
-            height: 220px;
-            object-fit: contain;
-            border: 2px solid #198754;
-            border-radius: 12px;
-            padding: 10px;
-            background: #fff;
-        }
         h2 {
             font-weight: 700;
             color: #198754;
@@ -52,63 +38,46 @@
         <div class="col-md-8 offset-md-2">
             <h2 class="mb-4 text-center"><i class="fa-solid fa-credit-card"></i> Thanh toán đơn hàng</h2>
 
-            <div class="alert alert-info text-center">
-                <i class="fa-solid fa-circle-info"></i> <strong>Chức năng thanh toán đang được phát triển</strong>
-            </div>
-
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-box"></i> Thông tin đơn hàng</h5>
                     <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold">10.000 VND</span></p>
-                    <p><strong>Phương thức thanh toán:</strong></p>
 
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="payment" id="cash" value="cash" checked>
-                        <label class="form-check-label" for="cash">
-                            <i class="fa-solid fa-truck"></i> Thanh toán khi nhận hàng
-                        </label>
-                    </div>
+                    <!-- Form thanh toán -->
+                    <form method="POST" action="{{ url_for('payment.payment') }}">
+                        <input type="hidden" name="order_type" value="billpayment">
+                        <input type="hidden" name="order_id" value="DH{{ now().strftime('%Y%m%d%H%M%S') }}">
+                        <input type="hidden" name="amount" value="10000">
+                        <input type="hidden" name="order_desc" value="Thanh toán đơn hàng mẫu">
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment" id="transfer" value="transfer">
-                        <label class="form-check-label" for="transfer">
-                            <i class="fa-solid fa-qrcode"></i> Thanh toán VNPay
-                        </label>
-                    </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="method" id="cash" value="cash" checked>
+                            <label class="form-check-label" for="cash">
+                                <i class="fa-solid fa-truck"></i> Thanh toán khi nhận hàng
+                            </label>
+                        </div>
 
-                    <div class="mt-4 d-flex justify-content-between">
-                        <a href="{{ url_for('main.view_cart') }}" class="btn btn-secondary">
-                            <i class="fa-solid fa-arrow-left"></i> Quay lại giỏ hàng
-                        </a>
-                        <button id="pay-btn" class="btn btn-success">
-                            <i class="fa-solid fa-check"></i> Nhận thanh toán
-                        </button>
-                    </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="method" id="transfer" value="vnpay">
+                            <label class="form-check-label" for="transfer">
+                                <i class="fa-solid fa-credit-card"></i> Thanh toán qua VNPAY
+                            </label>
+                        </div>
 
-                    <div id="qr-code" class="payment mt-4">
-                        <h5><i class="fa-solid fa-qrcode"></i> Quét QR để thanh toán VNPay</h5>
-                        <img id="qr-img" src="" alt="Scan QR VNPay" class="img-fluid">
-                    </div>
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{{ url_for('main.view_cart') }}" class="btn btn-secondary">
+                                <i class="fa-solid fa-arrow-left"></i> Quay lại giỏ hàng
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa-solid fa-check"></i> Thanh toán
+                            </button>
+                        </div>
+                    </form>
 
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-document.getElementById("pay-btn").addEventListener("click", function() {
-    let paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-    if (paymentMethod === "transfer") {
-        let qrDiv = document.getElementById("qr-code");
-        let qrImg = document.getElementById("qr-img");
-        qrImg.src = "{{ url_for('payment.payment_qr', amount=10000) }}";
-        qrDiv.style.display = "block";
-    } else {
-        document.getElementById("qr-code").style.display = "none";
-    }
-});
-</script>
-
 </body>
 </html>

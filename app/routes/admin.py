@@ -10,22 +10,22 @@ admin_bp = Blueprint('admin', __name__, url_prefix="/admin")
 @admin_bp.route('/dashboard')
 @login_required
 def admin_dashboard():
-    # Tổng doanh thu
+    # Tổng doanh thu (chỉ tính đơn hàng đã thanh toán)
     total_sales = (
         db.session.query(func.sum(CartItem.quantity * Product.price))
-        .join(Product, CartItem.product_id == Product.id)   # join qua product_id
+        .join(Product, CartItem.product_id == Product.id)
+        .filter(CartItem.status == 'paid')
         .scalar()
     ) or 0
 
     # Tổng sản lượng đã bán
     total_quantity = (
-    db.session.query(func.coalesce(func.sum(CartItem.quantity), 0))
-    .filter(CartItem.status == 'paid')
-    .scalar()
-)
+        db.session.query(func.coalesce(func.sum(CartItem.quantity), 0))
+        .filter(CartItem.status == 'paid')
+        .scalar()
+    )
 
-
-    # Lấy tất cả cart items
+    # Lấy tất cả cart items (mới nhất trước)
     carts = (
         CartItem.query.join(Product)
         .order_by(CartItem.created_at.desc())
@@ -44,7 +44,7 @@ def admin_dashboard():
 @admin_bp.route('/update_order/<int:cart_id>', methods=['POST'])
 @login_required
 def update_order(cart_id):
-    # Kiểm tra quyền admin trước
+    # Kiểm tra quyền admin
     if not current_user.is_admin:
         return "Bạn không có quyền truy cập", 403
 

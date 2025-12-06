@@ -37,13 +37,13 @@ def create_admin():
         password = request.form['password']
 
         # Check tồn tại
-        if User.query.filter_by(nameusers=username).first():
+        if User.query.filter_by(username=username).first():
             flash("Tên đăng nhập đã tồn tại!")
             return redirect(url_for("main.create_admin"))
 
         # Tạo admin
         new_admin = User(
-            nameusers=username,
+            username=username,
             email=email,
             is_admin=True
         )
@@ -66,7 +66,7 @@ def login_page():
         username = request.form["username"]
         password = request.form["password"]
 
-        user = User.query.filter_by(nameusers=username).first()
+        user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
             login_user(user)
@@ -94,7 +94,7 @@ def logout():
 
 
 # ============================
-# GIỎ HÀNG (CODE CŨ CỦA BẠN)
+# GIỎ HÀNG
 # ============================
 @main_bp.route('/cart')
 @login_required
