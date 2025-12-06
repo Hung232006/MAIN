@@ -51,12 +51,12 @@
 <body>
     <div class="container">
         <h1>{{ title }}</h1>
-        {% if result == "Thành công" %}
-            <p class="success">✅ Thanh toán thành công!</p>
-        {% elif result == "Lỗi" %}
-            <p class="error">❌ Thanh toán thất bại!</p>
+        {% if result == "Thanh toán thành công" %}
+            <p class="success">✅ {{ result }}</p>
+        {% elif result == "Thanh toán thất bại" %}
+            <p class="error">❌ {{ result }}</p>
         {% else %}
-            <p>Không có dữ liệu thanh toán.</p>
+            <p>{{ result }}</p>
         {% endif %}
 
         {% if order_id %}
