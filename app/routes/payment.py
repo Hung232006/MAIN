@@ -69,3 +69,38 @@ def payment():
         order_id = "DH" + datetime.now().strftime("%Y%m%d%H%M%S")
         total_amount, cart_items = get_cart_total()
         return render_template("checkout.html", order_id=order_id, amount=total_amount, title="Thanh toán")
+@payment_bp.route("/payment_return")
+def payment_return():
+    # Lấy dữ liệu từ query string VNPay gửi về
+    input_data = request.args.to_dict()
+    if not input_data:
+        return render_template("payment_return.html", title="Kết quả thanh toán", result="Không có dữ liệu")
+
+    vnp = vnpay()
+    vnp.responseData = input_data
+
+    order_id = input_data.get("vnp_TxnRef")
+    amount = int(input_data.get("vnp_Amount", 0)) / 100
+    order_desc = input_data.get("vnp_OrderInfo")
+    vnp_TransactionNo = input_data.get("vnp_TransactionNo")
+    vnp_ResponseCode = input_data.get("vnp_ResponseCode")
+
+    # Kiểm tra checksum
+    if vnp.validate_response(current_app.config["VNP_HASH_SECRET"]):
+        if vnp_ResponseCode == "00":
+            result = "Thanh toán thành công"
+        else:
+            result = "Thanh toán thất bại"
+    else:
+        result = "Sai checksum, dữ liệu không hợp lệ"
+
+    return render_template(
+        "payment_return.html",
+        title="Kết quả thanh toán",
+        result=result,
+        order_id=order_id,
+        amount=amount,
+        order_desc=order_desc,
+        vnp_TransactionNo=vnp_TransactionNo,
+        vnp_ResponseCode=vnp_ResponseCode
+    )
