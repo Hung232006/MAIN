@@ -103,6 +103,7 @@ def payment_return():
 @payment_bp.route("/payment", methods=["GET", "POST"])
 def payment():
     if request.method == "POST":
+        method = request.form.get("method")
         order_type = request.form.get("order_type")
         order_id = request.form.get("order_id")
         amount = int(request.form.get("amount", 0))
@@ -111,29 +112,39 @@ def payment():
         language = request.form.get("language")
         ipaddr = get_client_ip(request)
 
-        vnp = vnpay()
-        vnp.requestData['vnp_Version'] = '2.1.0'
-        vnp.requestData['vnp_Command'] = 'pay'
-        vnp.requestData['vnp_TmnCode'] = current_app.config["VNP_TMN_CODE"]
-        vnp.requestData['vnp_Amount'] = amount * 100
-        vnp.requestData['vnp_CurrCode'] = 'VND'
-        vnp.requestData['vnp_TxnRef'] = order_id
-        vnp.requestData['vnp_OrderInfo'] = order_desc
-        vnp.requestData['vnp_OrderType'] = order_type
-        vnp.requestData['vnp_Locale'] = language if language else 'vn'
-        if bank_code:
-            vnp.requestData['vnp_BankCode'] = bank_code
-        vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
-        vnp.requestData['vnp_IpAddr'] = ipaddr
-        vnp.requestData['vnp_ReturnUrl'] = current_app.config["VNP_RETURN_URL"]
+        if method == "cash":
+            # chỉ lưu đơn hàng, không redirect VNPAY
+            order = Order(txn_ref=order_id, amount=amount, status="pending")
+            db.session.add(order)
+            db.session.commit()
+            return "Đơn hàng đã được tạo, thanh toán khi nhận hàng."
+        elif method == "vnpay":
+            vnp = vnpay()
+            vnp.requestData['vnp_Version'] = '2.1.0'
+            vnp.requestData['vnp_Command'] = 'pay'
+            vnp.requestData['vnp_TmnCode'] = current_app.config["VNP_TMN_CODE"]
+            vnp.requestData['vnp_Amount'] = amount * 100
+            vnp.requestData['vnp_CurrCode'] = 'VND'
+            vnp.requestData['vnp_TxnRef'] = order_id
+            vnp.requestData['vnp_OrderInfo'] = order_desc
+            vnp.requestData['vnp_OrderType'] = order_type
+            vnp.requestData['vnp_Locale'] = language if language else 'vn'
+            if bank_code:
+                vnp.requestData['vnp_BankCode'] = bank_code
+            vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
+            vnp.requestData['vnp_IpAddr'] = ipaddr
+            vnp.requestData['vnp_ReturnUrl'] = current_app.config["VNP_RETURN_URL"]
 
-        vnpay_payment_url = vnp.get_payment_url(
-            current_app.config["VNP_URL"],
-            current_app.config["VNP_HASH_SECRET"]
-        )
-        return redirect(vnpay_payment_url)
+            vnpay_payment_url = vnp.get_payment_url(
+                current_app.config["VNP_URL"],
+                current_app.config["VNP_HASH_SECRET"]
+            )
+            return redirect(vnpay_payment_url)
+        else:
+            return "Phương thức thanh toán không hợp lệ!"
     else:
-        return render_template("payment.html", title="Thanh toán")
+        order_id = "DH" + datetime.now().strftime("%Y%m%d%H%M%S")
+        return render_template("checkout.html", order_id=order_id, title="Thanh toán")
 
 # --- IPN: VNPAY gọi server để báo trạng thái ---
 @payment_bp.route("/payment_ipn", methods=["GET", "POST"])

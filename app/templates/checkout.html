@@ -46,7 +46,8 @@
                     <!-- Form thanh toán -->
                     <form method="POST" action="{{ url_for('payment.payment') }}">
                         <input type="hidden" name="order_type" value="billpayment">
-                        <input type="hidden" name="order_id" value="DH{{ now().strftime('%Y%m%d%H%M%S') }}">
+                        <input type="hidden" name="order_id" value="{{ order_id }}">
+
                         <input type="hidden" name="amount" value="10000">
                         <input type="hidden" name="order_desc" value="Thanh toán đơn hàng mẫu">
 
