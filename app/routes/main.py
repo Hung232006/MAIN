@@ -180,3 +180,15 @@ def checkout():
         cart_items=cart_items,
         title="Thanh toán"
     )
+@main_bp.route("/payment_return")
+def payment_return():
+    input_data = request.args.to_dict()
+    # xử lý dữ liệu trả về từ VNPAY
+    return render_template("payment_return.html",
+                           title="Kết quả thanh toán",
+                           result="Thanh toán thành công" if input_data.get("vnp_ResponseCode") == "00" else "Thanh toán thất bại",
+                           order_id=input_data.get("vnp_TxnRef"),
+                           amount=int(input_data.get("vnp_Amount", "0")) // 100,
+                           order_desc=input_data.get("vnp_OrderInfo"),
+                           vnp_TransactionNo=input_data.get("vnp_TransactionNo"),
+                           vnp_ResponseCode=input_data.get("vnp_ResponseCode"))
